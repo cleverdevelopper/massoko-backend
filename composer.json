@@ -1,0 +1,19 @@
+{
+    "name": "massoko-backend/massoko-backend",
+    "description": "Backend para Massoko",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "cleverdeveloper"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "require": {
+        "firebase/php-jwt": "^7.0"
+    }
+}
