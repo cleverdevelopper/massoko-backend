@@ -250,5 +250,44 @@
                 'messages' => array_reverse($messages)
             ];
         }
+
+        public static function uploadAttachment($request) {
+            $loggedUser = $request->user;
+            if (!$loggedUser) return self::error('Usuário não autenticado', 401);
+
+            if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+                return self::error('Nenhum arquivo enviado ou erro no upload', 400);
+            }
+
+            $fileName = $_FILES['file']['name'];
+            $tmpName  = $_FILES['file']['tmp_name'];
+            $fileSize = $_FILES['file']['size'];
+
+            $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $blockedExtensions = ['php', 'phtml', 'php3', 'php4', 'php5', 'php7', 'phps', 'phar', 'exe', 'bat', 'sh', 'pl', 'py'];
+            if (in_array($ext, $blockedExtensions)) {
+                return self::error('Tipo de arquivo não permitido por motivos de segurança', 400);
+            }
+
+            $folder = __DIR__ . '/../../../../../images/attachments/';
+            if (!is_dir($folder)) {
+                mkdir($folder, 0777, true);
+            }
+
+            $newName = time() . '_' . uniqid() . '.' . $ext;
+            $dest = $folder . $newName;
+
+            if (move_uploaded_file($tmpName, $dest)) {
+                $fileUrl = URL . '/images/attachments/' . $newName;
+                return self::success('Arquivo carregado com sucesso', [
+                    'url'       => $fileUrl,
+                    'name'      => $fileName,
+                    'size'      => $fileSize,
+                    'extension' => $ext
+                ], 200);
+            }
+
+            return self::error('Falha ao salvar o arquivo no servidor', 500);
+        }
     }
 ?>

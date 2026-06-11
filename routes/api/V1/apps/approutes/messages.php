@@ -70,3 +70,18 @@
             return $result instanceof Response ? $result : new Response(200, $result, 'application/json');
         }
     ]);
+
+    //================================================
+    // Carregar Anexo (Protegido)
+    //================================================
+    $objRouter->post('/api/v1/messages/upload', [
+        'middlewares' => [
+            'api',
+            'jwt-auth'
+        ],
+        function ($request){
+            $result = MessagesApiController::uploadAttachment($request);
+            return $result instanceof Response ? $result : new Response(200, $result, 'application/json');
+        }
+    ]);
+
